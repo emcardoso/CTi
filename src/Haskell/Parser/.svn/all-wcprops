@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Parser
+END
+Parser.ly
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Parser/Parser.ly
+END
+ParseMonad.hs
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Parser/ParseMonad.hs
+END
+ParseUtils.hs
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Parser/ParseUtils.hs
+END
+Parser.hs
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Parser/Parser.hs
+END
+ParsePostProcess.hs
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Parser/ParsePostProcess.hs
+END

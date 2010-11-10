@@ -1,0 +1,27 @@
+> {-# LANGUAGE TypeSynonymInstances #-}
+
+> module Syntax.ExprSyn where
+
+> import Data.Generics
+
+> import Utils.Pretty
+
+> import Syntax.PatSyn
+> import Syntax.LitSyn
+
+> data Expr a 
+
+> type Alt a = ([Pat a], Expr a)
+
+> type Alts a = [Alt a]
+
+> instance Eq a => Eq (Expr a)
+> instance Ord a => Ord (Expr a)
+> instance Show a => Show (Expr a)
+> instance Pretty a => Pretty (Expr a)
+> instance Pretty a => Pretty (Alt a)
+> instance Pretty a => Pretty (Alts a)
+
+> instance Data a => Data (Expr a)
+
+

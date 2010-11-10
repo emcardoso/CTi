@@ -1,0 +1,27 @@
+
+[indentation]
+indent_width=4
+indent_type=0
+indent_hard_tab_width=8
+detect_indent=false
+indent_mode=2
+
+[project]
+name=core
+base_path=/home/rodrigo/Documents/doutorado/pesquisa/inferencia/core
+make_in_base_path=false
+description=
+run_cmd=
+
+[files]
+current_page=4
+FILE_NAME_0=91;Haskell;0;16;0;1;0;/home/rodrigo/Documents/doutorado/pesquisa/inferencia/core/src/Main.lhs;0
+FILE_NAME_1=1262;Haskell;0;16;0;1;0;/home/rodrigo/Documents/doutorado/pesquisa/inferencia/core/src/CompilerPipeline.lhs;0
+FILE_NAME_2=2926;Haskell;0;16;0;1;0;/home/rodrigo/Documents/doutorado/pesquisa/inferencia/core/src/Prelude/PreludeBuiltIn.lhs;0
+FILE_NAME_3=781;Haskell;0;16;0;1;0;/home/rodrigo/Documents/doutorado/pesquisa/inferencia/core/src/Tc/TcLoadTyContext.lhs;0
+FILE_NAME_4=11658;Haskell;0;16;0;1;0;/home/rodrigo/Documents/doutorado/pesquisa/inferencia/core/src/libs/Prelude.hs;0
+FILE_NAME_5=0;Haskell;0;16;0;1;0;/home/rodrigo/Documents/doutorado/pesquisa/inferencia/core/src/Syntax/NameSyn.lhs;0
+
+[long line marker]
+long_line_behaviour=1
+long_line_column=72

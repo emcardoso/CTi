@@ -1,0 +1,20 @@
+> {-#LANGUAGE TypeFamilies#-}
+
+> module Desugar.DesugarExpr where
+
+> import Haskell.Syntax.Syntax
+> import Desugar.Desugar
+> import Syntax.ExprSyn
+> import Syntax.NameSyn
+
+> desugarHsExp :: HsExp -> DesugarM (Expr Name)
+> desugarLit :: HsLiteral -> DesugarM (Expr Name)
+> desugarNumLit :: Expr Name -> HsLiteral -> DesugarM (Expr Name)
+> desugarStmts :: [HsStmt] -> DesugarM (Expr Name)
+> desugarStmt :: HsStmt -> DesugarM (Expr Name)
+> mkExpr :: Name -> Expr Name -> Expr Name
+> desugarInfixApp :: HsExp -> HsQOp -> HsExp -> DesugarM (Expr Name)
+> desugarSection :: Bool -> HsExp -> HsQOp -> DesugarM (Expr Name)
+> desugarEnum :: Expr Name -> [HsExp] -> DesugarM (Expr Name)
+> desugarListComp :: HsExp -> [HsStmt] -> DesugarM (Expr Name)
+> desugarExpTySig :: HsExp -> HsQualType -> DesugarM (Expr Name)

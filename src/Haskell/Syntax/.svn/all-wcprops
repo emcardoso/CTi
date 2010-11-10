@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Syntax
+END
+Syntax.hs
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Syntax/Syntax.hs
+END
+SyntaxConverter.hs
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Syntax/SyntaxConverter.hs
+END
+AnnotatedSyntax.hs
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/haskellmptc/!svn/ver/1/src/Language/Haskell/Syntax/AnnotatedSyntax.hs
+END

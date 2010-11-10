@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<gtodo>
+  <category title="Personal" place="0"><item><attribute id="1288193964" priority="2" done="0" start_date="734072" enddate="99999999" notify="0" endtime="-60" last_edited="1288193964"/><summary>Solu&#xE7;&#xE3;o para Prel&#xFA;dio</summary><comment>* Devemos ainda implementar uma solu&#xE7;&#xE3;o para as defini&#xE7;&#xF5;es que est&#xE3;o no preludio.</comment></item></category>
+  <category title="Business" place="1">
+    <item>
+      <attribute id="1288178646" priority="2" done="0" start_date="734072" enddate="99999999" notify="0" endtime="-60" last_edited="1288178646"/>
+      <summary>Anotar tipos em bindings de classes e inst&#xE2;ncias</summary>
+      <comment>Os tipos estando presentes em bindings de classes e inst&#xE2;ncias facilitaria o processo de verifica&#xE7;&#xE3;o de tipos.</comment>
+    </item>
+  </category>
+  <category title="Unfiled" place="2"/>
+</gtodo>

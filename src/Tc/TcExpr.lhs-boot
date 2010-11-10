@@ -1,0 +1,19 @@
+> module Tc.TcExpr where
+
+> import Syntax.CoreSyn
+
+> import Prelude.PreludeBuiltIn(tBool)
+
+> import Tc.Assumption 
+> import Tc.TcMonad 
+> import Tc.TcLit
+> import Tc.TcUnify
+> import Tc.TcPat
+
+checking expressions
+
+> tcExpr :: Expr Name -> TcM ([Pred Name], Ty Name)
+
+> tcAlts :: Alts Name -> TcM ([Pred Name], Ty Name)
+
+> tcAlt :: Alt Name -> TcM ([Pred Name], Ty Name)
