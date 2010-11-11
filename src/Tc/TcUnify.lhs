@@ -82,7 +82,7 @@ instances for types
 >                                                 show $ pprint t1, 
 >                                                 "\nwith:\n", 
 >                                                 show $ pprint t2])
->     mgu t1@(TyList t) t2@(TyList t') = mgu t t'
+>     mgu t1@(TyList t) t2@(TyList t') = mgu t t'   
 >     mgu t1 t2 = throwError (concat ["Cannot unify\n", show $ pprint t1, "\nwith:\n", show $ pprint t2])
 
 

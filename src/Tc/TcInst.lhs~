@@ -42,4 +42,3 @@ This module contains the functions for type instantiation
 > instantiate vs ts = inst tymap
 >                     where
 >                       tymap = Map.fromList (zip vs ts)
->

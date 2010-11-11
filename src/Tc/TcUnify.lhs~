@@ -155,3 +155,8 @@ This functions is used by the type ordering
 
 > unifyOrd :: (MGU t, Substitutable t) => t -> t -> TcM (TySubst Name)
 > unifyOrd t1 t2 = unify1 False t1 t2
+
+Begin{ALTER}
+
+
+end{ALTER}

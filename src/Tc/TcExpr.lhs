@@ -63,18 +63,33 @@ checking expressions
 >                          (ps',t)      <- context as (tcExpr e)
 >                          return (ps ++ ps', foldr TyFun t ts)
 
-> tcExpr e@(App l r) = do
->                       t1        <- newFreshTyVar Star
->                       check e t1
-
->{- tcExpr (App l r) = do
+> tcExpr (App l r) = do
 >                       (ps, tl) <- tcExpr l
 >                       (qs, tr) <- tcExpr r
 >                       t        <- newFreshTyVar Star
 >                       unify (TyFun tr t) tl
 >                       s <- getSubst
->                       return (apply s (ps ++ qs), apply s t) -}
+>                       return (apply s (ps ++ qs), apply s t) 
 
+begin{ALTER}
+
+> tcExpr (App l r) = do
+>                       (ps, tl) <- tcExpr l
+>                       (qs, tr) <- tcExpr r
+>                       t        <- newFreshTyVar Star
+>                       unify (TyFun tr t) tl
+>                       s <- getSubst
+>                       return (apply s (ps ++ qs), apply s t) 
+
+> tcExpr (App l r) = do
+>                       (ps, tl) <- tcExpr l
+>                       (qs, tr) <- tcExpr r
+>                       t        <- newFreshTyVar Star
+>                       unify (TyFun tr t) tl
+>                       s <- getSubst
+>                       return (apply s (ps ++ qs), apply s t) 
+
+end{ALTER}
 
 > tcExpr (Case e alts) = do
 >                           (ps,te) <- tcExpr e
@@ -136,5 +151,9 @@ checking one alternative
 >                    unify tFun (TyFun arg result) 
 >                    s <- getSubst
 >                    return (apply s arg, apply s result)
+
+> 
+> 
+> 
 
  -- end{alter}
