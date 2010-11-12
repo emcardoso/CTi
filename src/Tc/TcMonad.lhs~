@@ -166,19 +166,19 @@ begin{ALTER}
 Intersection type generalization rule
 
 > 
-> geni1 :: Ty Name -> Ty Name -> TcM ()
-> geni1 tau tau' = do
->                    unify tau tau'
->                    return ()
+
 >
-> geni2 :: Ty Name -> Ty Name -> [Pred] -> TcM ([Pred Name])
-> geni2 (TyAnd ts) tau = do sc <- quantify (aplly s' qs :=> t')
->                           geni2' ts sc ([],nullSubst) 
->
-> geni2' :: [Ty Name] -> Scheme Name -> ([Pred Name],TySubst Name) ->  TcM ([Pred Name])
-> geni2' [] _ (preds,sub) =  do 
->                               extSubst sub
->                               return preds  
+> geni :: Ty Name -> Ty Name -> [Pred] -> TcM ([Pred Name],Ty Name)
+> geni (TyAnd ts) tau ps = do s <- getSubst
+>                             sc <- quantify (apply s (ps :=> t'))
+>                             geni2' ts sc (ps,nullSubst) 
+> geni tau tau' ps = do
+>                      s <- unify tau tau'
+>                      return (aplly s ps, apply s tau')
+> geni2' :: [Ty Name] -> Scheme Name -> ([Pred Name],TySubst Name) ->  TcM ([Pred Name], Ty Name)
+> geni2' [] sc (preds,sub) =  do  (qs :=> t') <- freshInst sc  
+>                                 extSubst sub
+>                                 return (qs ++ preds, t')  
 > geni2' (tau:taus) sc (preds,sub) = do 
 >                                      (qs :=> t') <- freshInst sc  
 >                                      s <- match t' tau
@@ -200,8 +200,7 @@ For use in apllication rule only
 >                                          return (apply s a)
 >                                _   ->  throwError ("Ambiguos instersection type")
 >
-> inst :: Ty Name -> Ty Name -> TcM (TyName)
-> inst tau' tau = do   
+> insti tau' tau = do   
 >                    a <- newFreshTyVar Star
 >                    unify (tau') (TyFun tau a)
 >                    s <- getSubst
@@ -211,4 +210,5 @@ For use in apllication rule only
 > maybeMatch t1 t2 = catchError (match t1 t2) (\_ -> return Nothing)
 >
 >
+
 end{ALTER}

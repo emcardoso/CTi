@@ -4,6 +4,11 @@ This module does the type checking / inference for expressions
 
 > import Control.Monad
 > import Control.Monad.Trans
+> import Control.Monad.Error(throwError, catchError) -- ALTER
+
+> import Debug.Trace
+
+> import Data.Maybe(isJust)
 
 > import Prelude.PreludeBuiltIn(tBool)
 
@@ -20,31 +25,6 @@ This module does the type checking / inference for expressions
 > import Utils.Pretty
 
 
-begin{ALTER:}
-
-> check :: Expr Name -> Ty Name  -> TcM ([Pred Name], Ty Name)
-> check v@(Var _) te = do 
->                         (ps,tv) <- tcExpr v
->                         unify tv te
->                         s <- getSubst
->                         return (apply s ps, apply s tv)
->                        
-> check (App l r) te = do 
->                         (ps, tl) <- tcExpr l
->                         (t_arg,t_res) <- splitFun tl
->                         (qs,tr)  <- check r t_arg
->                         s <- getSubst
->                         return (apply s (ps ++ qs),te)                                                    
-> 
-> check e te = do
->                 (ps,ty) <- tcExpr e
->                 unify ty te
->                 s <- getSubst
->                 return (apply s ps, apply s ty)
->                  
->
-
-end{ALTER}
 
 checking expressions
 
@@ -63,14 +43,35 @@ checking expressions
 >                          (ps',t)      <- context as (tcExpr e)
 >                          return (ps ++ ps', foldr TyFun t ts)
 
-> tcExpr (App l r) = do
->                       (ps, tl) <- tcExpr l
->                       (qs, tr) <- tcExpr r
->                       t        <- newFreshTyVar Star
->                       unify (TyFun tr t) tl
->                       s <- getSubst
->                       return (apply s (ps ++ qs), apply s t) 
+begin{ALTER}
+ Application rule before modification
+ tcExpr (App l r) = do
+                       (ps, tl) <- tcExpr l
+                       (qs, tr) <- tcExpr r
+                       t        <- newFreshTyVar Star
+                       unify (TyFun tr t) tl
+                       s <- getSubst
+                       return (apply s (ps ++ qs), apply s t) 
+end{ALTER}
 
+begin{ALTER}
+
+> tcExpr (App l@(Var _) r) = do
+>                               (qs, tr) <- tcExpr r
+>                               s <- getSubst
+>                               (ps, tl) <- trace ("---|l = " ++ show l ++ " r = " ++ show r ++"  tr = " ++ show tr ++"\n\n") (tcExpr l)
+>                               tr' <- insti (apply s tl) tr
+>                               s'' <- getSubst
+>                               return (apply s'' (ps ++ qs), tr') 
+> tcExpr (App l r) = do
+>                               (qs, tl) <- tcExpr l
+>                               (ty_arg,ty_res) <-  splitFun tl
+>                               s <- getSubst
+>                               (ps,tr') <- geni (apply s ty_arg) (ty_res) []
+>                               s' <- getSubst 
+>                               return (apply s (ps ++ qs), apply s' ty_res) 
+
+end{ALTER}
 
 > tcExpr (Case e alts) = do
 >                           (ps,te) <- tcExpr e
@@ -134,7 +135,60 @@ checking one alternative
 >                    return (apply s arg, apply s result)
 
 > 
-> 
-> 
+> isVar :: Expr Name -> Bool
+> isVar (Var _) = True
+> isVar _       = False
 
  -- end{alter}
+
+begin{ALTER}
+
+Intersection type generalization rule
+
+>
+> geni :: Ty Name -> Ty Name -> [Pred Name] -> TcM ([Pred Name],Ty Name)
+> geni (TyAnd ts) tau ps = do 
+>                             sc <- quantify (ps :=> tau)
+>                             geni2' ts sc (ps,nullSubst) 
+> geni tau tau' ps = do
+>                       s <- unify tau tau'
+>                       return (apply s ps, apply s tau')
+>
+>
+> geni2' :: [Ty Name] -> Scheme Name -> ([Pred Name],TySubst Name) ->  TcM ([Pred Name], Ty Name)
+> geni2' [] sc (preds,sub) =  do  (qs :=> t') <- freshInst sc  
+>                                 extendSubst sub
+>                                 return (qs ++ preds, t')  
+> geni2' (tau:taus) sc (preds,sub) = do 
+>                                      (qs :=> t') <- freshInst sc  
+>                                      s <- match t' tau
+>                                      let s' = s @@ sub
+>                                      preds' <- return $ preds ++ (apply s' qs)
+>                                      sc' <- quantify (apply s' qs :=> t') 
+>                                      geni2' taus sc' (preds',s')
+
+Intersection type instantiation rule.
+For use in apllication rule only
+
+> insti :: Ty Name -> Ty Name -> TcM (Ty Name)
+> insti (TyAnd ts) tau =  do 
+>                            a  <- newFreshTyVar Star
+>                            ls <- mapM (\tau' -> maybeMatch (TyFun tau a) tau') ts
+>                            case filter isJust ls of
+>                                [Just s] -> do 
+>                                               extendSubst s
+>                                               return (apply s a)
+>                                _   ->  throwError ("Ambiguos instersection type")
+>
+> insti tau' tau = do   
+>                    a <- newFreshTyVar Star
+>                    a' <- trace ("Attempt to unify : " ++ show  (pprint (TyFun tau a)) ++ " with " ++ show (pprint tau')) (return a)
+>                    unify (TyFun tau a) tau'
+>                    s <- getSubst
+>                    return (apply s a)
+>
+>
+> maybeMatch t1 t2 = catchError (match t1 t2 >>= (\s -> return $ Just s)  ) (\_ -> return Nothing)
+>
+
+end{ALTER}
