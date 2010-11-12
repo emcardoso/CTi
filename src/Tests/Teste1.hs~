@@ -10,7 +10,7 @@ instance Mult Matrix Matrix Matrix
 instance Mult Matrix Vector Matrix
 instance Mult Int Int Int
 
-m1,m2,m3 :: Matrix
+m1 :: Matrix
 m1 = Matrix (Vector 1 1) (Vector 2 2)
 m2 = Matrix (Vector 1 1) (Vector 2 2)
 m3 = Matrix (Vector 1 1) (Vector 2 2)

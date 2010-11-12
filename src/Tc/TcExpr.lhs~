@@ -59,17 +59,18 @@ begin{ALTER}
 > tcExpr (App l@(Var _) r) = do
 >                               (qs, tr) <- tcExpr r
 >                               s <- getSubst
->                               (ps, tl) <- trace ("---|l = " ++ show l ++ " r = " ++ show r ++"  tr = " ++ show tr ++"\n\n") (tcExpr l)
+>                               (ps, tl) <- tcExpr l
 >                               tr' <- insti (apply s tl) tr
 >                               s'' <- getSubst
->                               return (apply s'' (ps ++ qs), tr') 
+>                               return ((apply s'' ps) ++ qs, tr') 
 > tcExpr (App l r) = do
 >                               (qs, tl) <- tcExpr l
 >                               (ty_arg,ty_res) <-  splitFun tl
 >                               s <- getSubst
->                               (ps,tr') <- geni (apply s ty_arg) (ty_res) []
+>                               (ps, tr) <- tcExpr r 
+>                               (ps',tr') <- geni (apply s ty_arg) (apply s tr) []
 >                               s' <- getSubst 
->                               return (apply s (ps ++ qs), apply s' ty_res) 
+>                               return (apply s' (ps' ++ ps ++ qs), apply s' ty_res) 
 
 end{ALTER}
 
@@ -151,7 +152,8 @@ Intersection type generalization rule
 >                             sc <- quantify (ps :=> tau)
 >                             geni2' ts sc (ps,nullSubst) 
 > geni tau tau' ps = do
->                       s <- unify tau tau'
+>                       s' <- getSubst
+>                       s <-  unify (apply s' tau) (apply s' tau')
 >                       return (apply s ps, apply s tau')
 >
 >
@@ -182,7 +184,6 @@ For use in apllication rule only
 >
 > insti tau' tau = do   
 >                    a <- newFreshTyVar Star
->                    a' <- trace ("Attempt to unify : " ++ show  (pprint (TyFun tau a)) ++ " with " ++ show (pprint tau')) (return a)
 >                    unify (TyFun tau a) tau'
 >                    s <- getSubst
 >                    return (apply s a)
