@@ -1,8 +1,10 @@
 
 g :: Int -> Int
 g x = x
+g 0 = 1
+g 2 = 2
 
-
+h = g 1
 
 class Num a where
     fromInteger :: Integer -> a

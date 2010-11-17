@@ -69,7 +69,7 @@ begin{ALTER}
 >                sc'  <- quantify (pc :=> apply (s @@ s') t)
 >                if sc' /= sc'' then 
 >                       throwError ("Type Signature error in\n" ++ (show $ pUnlines [(n :>: sc), (n :>: sc')]))
->                   else return (apply (s @@ s') ps')                    
+>                   else return (apply s ps')                    
 
 end{ALTER}
 

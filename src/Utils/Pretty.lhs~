@@ -16,7 +16,7 @@ Definition of a type class for pretty pritting the desugared syntax
 >                where
 >                   commaCons x y
 >                           | (show y) == [] = x 
->                           | otherwise = x <> d <+> y
+>                           | otherwise = x <> comma <+> y
 
 > pUnwords :: Pretty a => [a] -> Doc
 > pUnwords = foldr ((<+>) . pprint) empty

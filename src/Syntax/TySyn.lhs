@@ -24,8 +24,9 @@ Type variables
 
 > data TyVar a = Bound a Kind 
 >              | Free Int Kind               -- this is used by the type inference engine
+>              | Skol Int Kind               -- ALT: Constant type variable 
 >              deriving (Eq, Ord, Show, Data, Typeable)
-
+>
 
 Type construtors
 
@@ -99,6 +100,7 @@ The pretty printer
 >     pprint (TyFun f a)  = pprint f <+> parrow <+> pprint a
 >     pprint (TyTuple ts) = parens (pPunctuate comma ts)
 >     pprint (TyList t)   = brackets (pprint t)
+>     pprint (TyAnd ts) = parens (pPunctuate pwedge ts)
 
 > instance Pretty a => Pretty (TyVar a) where
 >     pprint (Bound s _) = pprint s

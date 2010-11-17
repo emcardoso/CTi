@@ -211,7 +211,7 @@ Here we do a function to apply infered kinds
 > applyInTy kc (TyApp l r) = liftM2 TyApp (applyInTy kc l) (applyInTy kc r)
 > applyInTy kc (TyTuple ts) = liftM TyTuple $ mapM (applyInTy kc) ts
 > applyInTy kc (TyList t) = liftM TyList (applyInTy kc t)
-> applyInTy kc (TyAnd ts) = liftM TyAnd $ mapM (applyInTy kc) ts
+> applyInTy kc (TyAnd ts) = liftM TyTuple $ mapM (applyInTy kc) ts
 
 > applyInTyCon :: Map.Map (Kindable Name) Kind -> Kindable Name -> IO (Kindable Name)
 > applyInTyCon kc t@(TyConDef (TyCon n _)) = case Map.lookup t kc of

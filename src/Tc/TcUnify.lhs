@@ -15,6 +15,7 @@ This module defines the main engine of unification
 > import Tc.Assumption
 
 > import Tc.Utils.Nameable
+> import Data.Maybe
 
 > import Utils.Pretty
 
@@ -94,9 +95,17 @@ instances for types
 
 > instance Matchable (Ty Name) where
 >     match (TyApp l r) (TyApp l' r') = do
->                                       s  <- match l l'
->                                       s' <- match (apply s r) (apply s r')
->                                       merge s' s
+>                                          s  <- match l l'
+>                                          s' <- match (apply s r) (apply s r')
+>                                          merge s' s
+>
+>     match t1@(TVar (Skol i k)) t2@(TVar (Skol i' k')) = if (i == i')  && (k == k') 
+>                                                          then return nullSubst 
+>                                                          else throwError (concat ["Cannot match skolem constants \n", 
+>                                                                               show $ pprint t1, 
+>                                                                               "\nwith:\n", 
+>                                                                               show $ pprint t2])
+>
 >     match (TVar v) t = return [(v,t)]
 >     match (TCon tc) (TCon tc') | tc == tc' = return nullSubst
 >                                | otherwise = throwError (concat ["Cannot match\n", 
@@ -120,6 +129,40 @@ instances for types
 >                                                 show $ pprint t1, 
 >                                                 "\nwith:\n", 
 >                                                 show $ pprint t2])
+
+begin{ALT}
+
+>     match t1@(TyAnd ts) t2@(TyAnd ts') 
+>           = do
+>               let len1 = length ts
+>                   len2 = length ts'
+>                   match' (t,t') = catchError (do 
+>                                                  sub <- match  t t' 
+>                                                  return (Just sub) )
+>                                              (\e -> return Nothing)
+>                  
+>                   matchAny oldsub []     = return oldsub                                              
+>                   matchAny oldsub (l:ls) = do l' <- mapM (\(x,y) -> match' (x , apply oldsub y) ) l
+>                                               case [fromJust ms | ms <- l', isJust ms] of
+>                                                   [s] -> matchAny (s @@ oldsub) ls
+>                                                   
+>                                                   _   -> throwError (concat ["Cannot match\n",
+>                                                                             show $ pprint t1,
+>                                                                             "\nwith:\n",
+>                                                                             show $ pprint t2])
+>                                                                                                                                     
+>               case len1 == len2 of
+>                   True  -> matchAny nullSubst $ map (\tau -> [(tau, tau') | tau' <- ts']) ts
+                              
+>                   False -> throwError (concat ["Cannot match\n", 
+>                                                 show $ pprint t1, 
+>                                                 "\nwith:\n", 
+>                                                 show $ pprint t2])
+>          
+>
+
+end{ALT}
+
 >     match t1@(TyList t) t2@(TyList t') = match t t'
 >     match t1 t2 = throwError (concat ["Cannot match\n", show $ pprint t1, "\nwith:\n", show $ pprint t2])
 

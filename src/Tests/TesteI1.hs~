@@ -1,0 +1,9 @@
+data Bool = True | False  
+
+id :: a -> a
+id x = x 
+
+m :: ([Char] -> [Char] ^ Bool -> Bool) -> ([Char],Bool)
+m x = (x ['a'], x True)
+
+g = m id 

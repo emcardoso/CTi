@@ -73,15 +73,15 @@ begil{ALT}
 >                              unify t (foldr TyFun t' ts)
 >                              return (ps ++ qs, as, t')
 > 
-> tcPat' (PIr pat,t) = tcPat pat
-> tcPat' (PList pats,t'') = do 
->                             (ps, as, ts) <- tcPats pats
->                             t' <- newFreshTyVar Star
->                             mapM_ (unify t') ts
->                             return (ps, as, tList t')
-> tcPat' (PTuple pats,t') = do
->                             (ps, as, ts) <- tcPats pats
->                             return (ps, as, tTuple ts)
+> tcPat' (PIr pat) = tcPat pat
+> tcPat' (PList pats) = do 
+>                         (ps, as, ts) <- tcPats pats
+>                         t' <- newFreshTyVar Star
+>                         mapM_ (unify t') ts
+>                         return (ps, as, tList t')
+> tcPat' (PTuple pats) = do
+>                         (ps, as, ts) <- tcPats pats
+>                         return (ps, as, tTuple ts)
 
 
 

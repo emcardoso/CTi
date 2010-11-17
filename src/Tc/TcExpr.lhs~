@@ -24,6 +24,8 @@ This module does the type checking / inference for expressions
 
 > import Utils.Pretty
 
+> import Data.List(union)
+
 
 
 checking expressions
@@ -56,21 +58,31 @@ end{ALTER}
 
 begin{ALTER}
 
-> tcExpr (App l@(Var _) r) = do
->                               (qs, tr) <- tcExpr r
->                               s <- getSubst
->                               (ps, tl) <- tcExpr l
->                               tr' <- insti (apply s tl) tr
->                               s'' <- getSubst
->                               return ((apply s'' ps) ++ qs, tr') 
+ tcExpr (App l@(Var _) r) = do
+                               (qs, tr) <- tcExpr r
+                               (ps, tl) <- tcExpr l
+                               insti (apply s tl) tr
+                               s'' <- getSubst
+                               return ((apply s'' ps) ++ qs, tr') 
+
+>
+>
 > tcExpr (App l r) = do
->                               (qs, tl) <- tcExpr l
->                               (ty_arg,ty_res) <-  splitFun tl
->                               s <- getSubst
->                               (ps, tr) <- tcExpr r 
->                               (ps',tr') <- geni (apply s ty_arg) (apply s tr) []
->                               s' <- getSubst 
->                               return (apply s' (ps' ++ ps ++ qs), apply s' ty_res) 
+>                               (ps, tl) <- tcExpr l
+>                               if isFun tl                               
+>                                  then do
+>                                          (ty_param,ty_res) <-  splitFun tl
+>                                          (qs, tr) <- tcExpr r 
+>                                          (qs',tr') <- geni (ty_param) tr qs
+>                                          s' <- getSubst 
+>                                          return (apply s' (ps ++ qs'), apply s' ty_res) 
+>
+>                                  else do
+>                                          (qs, tr) <- tcExpr r
+>                                          tr' <- insti tl tr
+>                                          s'' <- getSubst
+>                                          return ((apply s'' ps) ++ qs, apply s'' tr')                                      
+>
 
 end{ALTER}
 
@@ -105,6 +117,9 @@ end{ALTER}
 >                       (ps,t) <- context as (tcExpr e)
 >                       return (ps, t)
 
+
+begin{ALT}
+
 checking a set of alternatives
 
 > tcAlts :: Alts Name -> TcM ([Pred Name], Ty Name)
@@ -118,6 +133,30 @@ checking a set of alternatives
 >                   return (apply s ps', apply s t)
 
 checking one alternative
+
+>
+> tcAlts' :: Ty Name -> Alts Name -> TcM ([Pred Name], Ty Name)
+> tcAlts'  t alts = do
+>                        psts <- mapM (tcAlt' t ) alts
+>                        let
+>                            ps'     = concatMap fst psts
+>                            (t:ts)  = map snd psts
+>                        mapM_ (unify t) ts
+>                        s <- getSubst
+>                        return (apply s ps', apply s t)
+
+
+> tcAlt' :: Ty Name -> Alt Name -> TcM ([Pred Name], Ty Name)
+> tcAlt' t (pats, e) = do
+>                       (ps, as, ts) <- tcPats' (args pats t)
+>                       (qs, t')      <- context as (tcExpr e)
+>                       return (ps ++ qs, foldr TyFun t' ts)
+>    where
+>      args [] t = [] 
+>      args (pat:pats) (TyFun arg res) = (pat,arg) : args pats res
+>      args (pat:pats) _               = error " Invalid type annotation."
+
+end{ALT}
 
 > tcAlt :: Alt Name -> TcM ([Pred Name], Ty Name)
 > tcAlt (pats, e) = do
@@ -150,7 +189,7 @@ Intersection type generalization rule
 > geni :: Ty Name -> Ty Name -> [Pred Name] -> TcM ([Pred Name],Ty Name)
 > geni (TyAnd ts) tau ps = do 
 >                             sc <- quantify (ps :=> tau)
->                             geni2' ts sc (ps,nullSubst) 
+>                             geni2' ts sc ([],nullSubst) 
 > geni tau tau' ps = do
 >                       s' <- getSubst
 >                       s <-  unify (apply s' tau) (apply s' tau')
@@ -160,14 +199,16 @@ Intersection type generalization rule
 > geni2' :: [Ty Name] -> Scheme Name -> ([Pred Name],TySubst Name) ->  TcM ([Pred Name], Ty Name)
 > geni2' [] sc (preds,sub) =  do  (qs :=> t') <- freshInst sc  
 >                                 extendSubst sub
->                                 return (qs ++ preds, t')  
+>                                 return (apply sub  preds, t')  
 > geni2' (tau:taus) sc (preds,sub) = do 
 >                                      (qs :=> t') <- freshInst sc  
->                                      s <- match t' tau
+>                                      s <- trace ( "*** {geni2} t'= " ++ show (pprint t') ++ "   tau = " ++ show (pprint tau) ) $ unify t' tau
 >                                      let s' = s @@ sub
->                                      preds' <- return $ preds ++ (apply s' qs)
->                                      sc' <- quantify (apply s' qs :=> t') 
->                                      geni2' taus sc' (preds',s')
+>                                      preds' <- return $ preds ++ (apply s'  qs)
+>                                      sc' <- quantify (qs :=> t')
+>                                      (qs' :=> t'')  <- trace ("s = " ++ show  s') (freshInst sc')
+>                                      sc'' <- quantify (apply (qs' :=> t''))
+>                                      geni2' (apply s' taus)  sc'' (trace ("\n***t'' =  " ++ show t'') (preds',s'))
 
 Intersection type instantiation rule.
 For use in apllication rule only
@@ -176,7 +217,7 @@ For use in apllication rule only
 > insti (TyAnd ts) tau =  do 
 >                            a  <- newFreshTyVar Star
 >                            ls <- mapM (\tau' -> maybeMatch (TyFun tau a) tau') ts
->                            case filter isJust ls of
+>                            case (filter isJust ls) of
 >                                [Just s] -> do 
 >                                               extendSubst s
 >                                               return (apply s a)
@@ -191,5 +232,12 @@ For use in apllication rule only
 >
 > maybeMatch t1 t2 = catchError (match t1 t2 >>= (\s -> return $ Just s)  ) (\_ -> return Nothing)
 >
+> isIntersection :: Ty Name -> Bool
+> isIntersection (TyAnd _) = True
+> isIntersection _        = False
+>
+> isFun :: Ty Name -> Bool
+> isFun (TyFun _ _ ) = True
+> isFun _          = False
 
 end{ALTER}

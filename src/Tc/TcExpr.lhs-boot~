@@ -16,6 +16,6 @@ checking expressions
 
 > tcAlts :: Alts Name -> TcM ([Pred Name], Ty Name)
 
-> tcAlts' :: Ty Name -> Alts Name -> TcM ([Pred Name], Ty Name)
+>> tcAlts' :: Ty Name -> Alts Name -> TcM ([Pred Name], Ty Name)
 
 > tcAlt :: Alt Name -> TcM ([Pred Name], Ty Name)
