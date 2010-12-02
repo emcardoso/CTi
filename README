@@ -1,8 +1,2 @@
 This project is prototype type inference algorithm for Haskell supporting
-multiparameter type classes without functional dependencies, type families
-and any kind of extensions.
-
-To get a feel of the project, please read:
-
-- A solution for multiparameter type class dilemma in XIII Brasilian Symposyum on 
-  Programmming Languages, Gramado, RS, Brazil, 2009.
+itersection types on funtion parameters. 
