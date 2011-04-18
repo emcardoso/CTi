@@ -1,2 +1,2 @@
-This project is prototype type inference algorithm for Haskell supporting
-itersection types on funtion parameters. 
+This project is a prototype for a type inference algorithm for Haskell supporting
+intersection types on function parameters. 
